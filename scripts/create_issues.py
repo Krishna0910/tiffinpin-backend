@@ -24,16 +24,25 @@ from pathlib import Path
 def create_issue(issue: dict, dry_run: bool = False) -> bool:
     labels = ",".join(issue["labels"])
     cmd = [
-        "gh", "issue", "create",
-        "--title", issue["title"],
-        "--body", issue["body"],
-        "--label", labels,
-        "--milestone", issue["milestone"],
-        "--assignee", issue["assignee"],
+        "gh",
+        "issue",
+        "create",
+        "--title",
+        issue["title"],
+        "--body",
+        issue["body"],
+        "--label",
+        labels,
+        "--milestone",
+        issue["milestone"],
+        "--assignee",
+        issue["assignee"],
     ]
     print(f"[{issue['number']:03d}] {issue['title']}")
     if dry_run:
-        print(f"       DRY RUN — would assign to {issue['assignee']}, milestone '{issue['milestone']}'")
+        print(
+            f"       DRY RUN — would assign to {issue['assignee']}, milestone '{issue['milestone']}'"
+        )
         return True
 
     result = subprocess.run(cmd, capture_output=True, text=True)
@@ -45,13 +54,27 @@ def create_issue(issue: dict, dry_run: bool = False) -> bool:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--file", default="scripts/issues.json", help="Path to issues.json (default: scripts/issues.json)")
-    parser.add_argument("--dry-run", action="store_true", help="Print what would be created without calling gh")
-    parser.add_argument("--from", dest="from_num", type=int, default=1, help="Start issue number (inclusive)")
-    parser.add_argument("--to", dest="to_num", type=int, default=999, help="End issue number (inclusive)")
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        "--file",
+        default="scripts/issues.json",
+        help="Path to issues.json (default: scripts/issues.json)",
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Print what would be created without calling gh"
+    )
+    parser.add_argument(
+        "--from", dest="from_num", type=int, default=1, help="Start issue number (inclusive)"
+    )
+    parser.add_argument(
+        "--to", dest="to_num", type=int, default=999, help="End issue number (inclusive)"
+    )
     parser.add_argument("--milestone", help="Only create issues in this milestone")
-    parser.add_argument("--sleep", type=float, default=1.0, help="Seconds between API calls (rate-limit safety)")
+    parser.add_argument(
+        "--sleep", type=float, default=1.0, help="Seconds between API calls (rate-limit safety)"
+    )
     args = parser.parse_args()
 
     path = Path(args.file)
@@ -61,7 +84,8 @@ def main() -> None:
 
     all_issues = json.loads(path.read_text())
     selected = [
-        i for i in all_issues
+        i
+        for i in all_issues
         if args.from_num <= i["number"] <= args.to_num
         and (args.milestone is None or i["milestone"] == args.milestone)
     ]
